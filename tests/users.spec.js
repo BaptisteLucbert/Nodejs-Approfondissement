@@ -10,6 +10,12 @@ const usersService = require("../api/users/users.service");
 describe("tester API users", () => {
   let token;
   const USER_ID = "fake";
+  const MOCK_USER = {
+    _id: USER_ID,
+    name: "ana",
+    email: "nfegeg@gmail.com",
+    role: "admin",
+  };
   const MOCK_DATA = [
     {
       _id: USER_ID,
@@ -26,7 +32,9 @@ describe("tester API users", () => {
 
   beforeEach(() => {
     token = jwt.sign({ userId: USER_ID }, config.secretJwtToken);
-    // mongoose.Query.prototype.find = jest.fn().mockResolvedValue(MOCK_DATA);
+    // Mock pour le middleware d'authentification (User.findById)
+    mockingoose(User).toReturn(MOCK_USER, "findOne");
+    // Mock pour les autres opérations
     mockingoose(User).toReturn(MOCK_DATA, "find");
     mockingoose(User).toReturn(MOCK_DATA_CREATED, "save");
   });
@@ -60,5 +68,6 @@ describe("tester API users", () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+    mockingoose.resetAll();
   });
 });
